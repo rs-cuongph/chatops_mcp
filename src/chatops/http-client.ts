@@ -4,12 +4,12 @@
 import axios, { type AxiosInstance } from "axios";
 import FormData from "form-data";
 import type {
-  ChatOpsRawTeam, ChatOpsRawChannel, ChatOpsRawPost, ChatOpsRawPostList,
+  ChatOpsRawUser, ChatOpsRawTeam, ChatOpsRawChannel, ChatOpsRawPost, ChatOpsRawPostList,
   ChatOpsRawFileUploadResponse, ChatOpsRawFileInfo, ChatOpsRawReaction, ChatOpsRawEmoji,
   ChatOpsRawPostSearchResults, ChatOpsRawFileSearchResults,
 } from "../types/chatops-api.js";
 import type {
-  ChatOpsTeam, ChatOpsChannel, ChatOpsPost, ChatOpsPostList,
+  ChatOpsUser, ChatOpsTeam, ChatOpsChannel, ChatOpsPost, ChatOpsPostList,
   ChatOpsFileInfo, ChatOpsFileUploadResult, ChatOpsReaction, ChatOpsEmoji,
   ChatOpsPostSearchResults, ChatOpsFileSearchResults, SessionCookies,
 } from "../types.js";
@@ -20,9 +20,10 @@ import {
   postsUrl, filesUrl, postReactionsUrl, reactionsUrl, currentUserUrl,
   emojiListUrl, emojiUrl, emojiByNameUrl,
   searchPostsUrl, fileInfoUrl, searchFilesUrl,
+  userUrl, userByNameUrl, searchUsersUrl, usersByIdsUrl, postUrl,
 } from "./endpoints.js";
 import {
-  mapTeam, mapChannel, mapPost, mapPostList, mapFileInfo, mapFileUploadResult, mapReaction, mapEmoji,
+  mapUser, mapTeam, mapChannel, mapPost, mapPostList, mapFileInfo, mapFileUploadResult, mapReaction, mapEmoji,
 } from "./mappers.js";
 
 export class ChatOpsHttpClient {
@@ -37,6 +38,44 @@ export class ChatOpsHttpClient {
       validateStatus: () => true,
     });
   }
+
+  // ── Users ────────────────────────────────────────────────────────────────────
+
+  async getUser(userId: string): Promise<ChatOpsUser> {
+    const endpoint = userUrl(this.baseUrl, userId);
+    const res = await this.http.get<ChatOpsRawUser>(endpoint);
+    this.assertOk(res.status, endpoint, res.data);
+    return mapUser(res.data as ChatOpsRawUser);
+  }
+
+  async getUserByName(username: string): Promise<ChatOpsUser> {
+    const endpoint = userByNameUrl(this.baseUrl, username);
+    const res = await this.http.get<ChatOpsRawUser>(endpoint);
+    this.assertOk(res.status, endpoint, res.data);
+    return mapUser(res.data as ChatOpsRawUser);
+  }
+
+  async searchUsers(term: string, options?: { page?: number; perPage?: number }): Promise<ChatOpsUser[]> {
+    const endpoint = searchUsersUrl(this.baseUrl);
+    const res = await this.http.post<ChatOpsRawUser[]>(endpoint, {
+      term,
+      page: options?.page ?? 0,
+      per_page: options?.perPage ?? 20,
+    });
+    this.assertOk(res.status, endpoint, res.data);
+    return (res.data as ChatOpsRawUser[]).map(mapUser);
+  }
+
+  /** Batch-resolve user IDs → users. Max ~200 IDs per call. */
+  async getUsersByIds(userIds: string[]): Promise<ChatOpsUser[]> {
+    if (userIds.length === 0) return [];
+    const endpoint = usersByIdsUrl(this.baseUrl);
+    const res = await this.http.post<ChatOpsRawUser[]>(endpoint, userIds);
+    this.assertOk(res.status, endpoint, res.data);
+    return (res.data as ChatOpsRawUser[]).map(mapUser);
+  }
+
+  // ── Teams ────────────────────────────────────────────────────────────────────
 
   async getTeams(): Promise<ChatOpsTeam[]> {
     const endpoint = teamsUrl(this.baseUrl);
@@ -87,6 +126,13 @@ export class ChatOpsHttpClient {
     const res = await this.http.get<ChatOpsRawChannel>(endpoint);
     this.assertOk(res.status, endpoint, res.data);
     return mapChannel(res.data as ChatOpsRawChannel);
+  }
+
+  async getPost(postId: string): Promise<ChatOpsPost> {
+    const endpoint = postUrl(this.baseUrl, postId);
+    const res = await this.http.get<ChatOpsRawPost>(endpoint);
+    this.assertOk(res.status, endpoint, res.data);
+    return mapPost(res.data as ChatOpsRawPost);
   }
 
   async getChannelPosts(channelId: string, page = 0, perPage = 30): Promise<ChatOpsPostList> {
@@ -207,14 +253,16 @@ export class ChatOpsHttpClient {
   async searchFiles(
     teamId: string,
     terms: string,
-    options?: { page?: number; perPage?: number }
+    options?: { page?: number; perPage?: number; channelId?: string }
   ): Promise<ChatOpsFileSearchResults> {
     const endpoint = searchFilesUrl(this.baseUrl, teamId);
-    const res = await this.http.post<ChatOpsRawFileSearchResults>(endpoint, {
+    const body: Record<string, unknown> = {
       terms,
       page: options?.page ?? 0,
       per_page: options?.perPage ?? 20,
-    });
+    };
+    if (options?.channelId) body.channel_ids = [options.channelId];
+    const res = await this.http.post<ChatOpsRawFileSearchResults>(endpoint, body);
     this.assertOk(res.status, endpoint, res.data);
     const raw = res.data as ChatOpsRawFileSearchResults;
     const order = raw.order ?? [];

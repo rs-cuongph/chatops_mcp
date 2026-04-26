@@ -6,6 +6,7 @@ import type { ChatOpsFileInfo } from "../types.js";
 export interface SearchFilesInput {
   teamId: string;
   terms: string;
+  channelId?: string;    // optional: filter to a specific channel by ID
   page?: number;
   perPage?: number;
 }
@@ -30,6 +31,7 @@ export async function handleSearchFiles(
   const client = await createClient(cfg);
   try {
     const result = await client.searchFiles(input.teamId, input.terms, {
+      channelId: input.channelId,
       page: input.page ?? 0,
       perPage: input.perPage ?? 20,
     });

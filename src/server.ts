@@ -29,6 +29,9 @@ import { handleSearchPosts } from "./tools/search-posts.js";
 import { handleGetFileInfo } from "./tools/get-file-info.js";
 import { handleSearchFiles } from "./tools/search-files.js";
 import { handleSearchLinks } from "./tools/search-links.js";
+import { handleGetUser } from "./tools/get-user.js";
+import { handleSearchUsers } from "./tools/search-users.js";
+import { handleGetPost } from "./tools/get-post.js";
 
 // ---------------------------------------------------------------------------
 // MCP server factory
@@ -39,6 +42,48 @@ function createMcpServer(): McpServer {
     name: "chatops-mcp",
     version: "0.1.0",
   });
+
+  // ── Users ────────────────────────────────────────────────────────────────
+
+  server.tool(
+    "chatops_get_user",
+    `Look up a ChatOps user by ID or username.
+
+Returns: username, display name, email, position, roles, and join date.
+Use this to resolve a userId from post output into a human-readable name.`,
+    {
+      userId: z.string().optional()
+        .describe("User ID (preferred lookup)."),
+      username: z.string().optional()
+        .describe("Username handle (without @) — used when userId is not provided."),
+    },
+    async (input) => handleGetUser(input, config)
+  );
+
+  server.tool(
+    "chatops_search_users",
+    "Search ChatOps users by name, username, or email. Returns matching users with display name, role, and position.",
+    {
+      term: z.string().min(1).describe("Search term to match against username, name, or email."),
+      page: z.number().int().min(0).optional().default(0).describe("0-based page (default 0)."),
+      perPage: z.number().int().min(1).max(60).optional().default(20).describe("Results per page (default 20)."),
+    },
+    async (input) => handleSearchUsers(input, config)
+  );
+
+  // ── Posts ────────────────────────────────────────────────────────────────
+
+  server.tool(
+    "chatops_get_post",
+    `Get a single ChatOps post by its ID.
+
+Returns the full message, resolved author, channel, timestamps, file attachments, and thread info.
+Useful for inspecting a specific post referenced by search results, reactions, or file info.`,
+    {
+      postId: z.string().min(1).describe("ChatOps post ID."),
+    },
+    async (input) => handleGetPost(input, config)
+  );
 
   // ── Teams ────────────────────────────────────────────────────────────────
 
@@ -251,12 +296,14 @@ Built-in system emoji (e.g. :thumbsup:, :heart:) are not stored as custom emoji 
 
 Supports Mattermost search syntax:
 - Phrase search: "exact phrase"
-- Channel filter: in:channel-name
+- Channel filter: in:channel-name (or use channelName param)
 - Author filter: from:username
 - Date filter: on:YYYY-MM-DD, before:YYYY-MM-DD, after:YYYY-MM-DD`,
     {
       teamId: z.string().min(1).describe("ChatOps team ID to search within."),
       terms: z.string().min(1).describe("Search query. Supports Mattermost search syntax."),
+      channelName: z.string().optional()
+        .describe("Optional channel slug/name to restrict search to a specific channel."),
       isOrSearch: z.boolean().optional().default(false)
         .describe("If true, terms are OR-ed instead of AND-ed (default false)."),
       page: z.number().int().min(0).optional().default(0).describe("0-based page (default 0)."),
@@ -282,6 +329,8 @@ Returns file metadata including name, size, MIME type, and the post/channel it w
     {
       teamId: z.string().min(1).describe("ChatOps team ID to search within."),
       terms: z.string().min(1).describe("Search term — matched against file name."),
+      channelId: z.string().optional()
+        .describe("Optional channel ID to restrict search to a specific channel."),
       page: z.number().int().min(0).optional().default(0).describe("0-based page (default 0)."),
       perPage: z.number().int().min(1).max(60).optional().default(20).describe("Results per page (default 20)."),
     },
@@ -292,10 +341,12 @@ Returns file metadata including name, size, MIME type, and the post/channel it w
     "chatops_search_links",
     `Find posts that contain shared URLs/links in a ChatOps team.
 
-Optionally narrow the search by providing a keyword (e.g. a domain like "github.com" or a topic).
+Optionally narrow by channel name (slug) or a keyword (e.g. a domain like "github.com").
 Returns matching posts with all extracted URLs highlighted.`,
     {
       teamId: z.string().min(1).describe("ChatOps team ID to search within."),
+      channelName: z.string().optional()
+        .describe("Optional channel slug/name to restrict search to a specific channel."),
       term: z.string().optional()
         .describe("Optional keyword to narrow results (e.g. \"github.com\", \"confluence\")."),
       page: z.number().int().min(0).optional().default(0).describe("0-based page (default 0)."),

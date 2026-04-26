@@ -1,7 +1,5 @@
-// ---------------------------------------------------------------------------
-// Mappers: Raw ChatOps API types → Normalized domain types
-// ---------------------------------------------------------------------------
 import type {
+  ChatOpsRawUser,
   ChatOpsRawTeam,
   ChatOpsRawChannel,
   ChatOpsRawPost,
@@ -11,6 +9,7 @@ import type {
   ChatOpsRawEmoji,
 } from "../types/chatops-api.js";
 import type {
+  ChatOpsUser,
   ChatOpsTeam,
   ChatOpsChannel,
   ChatOpsPost,
@@ -21,6 +20,23 @@ import type {
   ChatOpsEmoji,
 } from "../types.js";
 import { formatTimestamp, formatFileSize, channelTypeLabel, teamTypeLabel } from "../utils.js";
+
+// ── Users ────────────────────────────────────────────────────────────────────
+
+export function mapUser(raw: ChatOpsRawUser): ChatOpsUser {
+  const displayName = raw.nickname
+    || [raw.first_name, raw.last_name].filter(Boolean).join(" ")
+    || raw.username;
+  return {
+    id: raw.id,
+    username: raw.username,
+    displayName,
+    email: raw.email,
+    position: raw.position,
+    roles: raw.roles.split(" ").filter(Boolean),
+    createdAt: formatTimestamp(raw.create_at),
+  };
+}
 
 // ── Teams ────────────────────────────────────────────────────────────────────
 

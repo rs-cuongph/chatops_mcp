@@ -9,6 +9,33 @@ function url(base: string, path: string): string {
   return base.replace(/\/$/, "") + path;
 }
 
+// ── Users ────────────────────────────────────────────────────────────────────
+
+/** GET /api/v4/users/:userId */
+export function userUrl(baseUrl: string, userId: string): string {
+  return url(baseUrl, `${API}/users/${encodeURIComponent(userId)}`);
+}
+
+/** GET /api/v4/users/username/:username */
+export function userByNameUrl(baseUrl: string, username: string): string {
+  return url(baseUrl, `${API}/users/username/${encodeURIComponent(username)}`);
+}
+
+/** POST /api/v4/users/search — search users by term */
+export function searchUsersUrl(baseUrl: string): string {
+  return url(baseUrl, `${API}/users/search`);
+}
+
+/** POST /api/v4/users/ids — get users by IDs (batch) */
+export function usersByIdsUrl(baseUrl: string): string {
+  return url(baseUrl, `${API}/users/ids`);
+}
+
+/** GET /api/v4/posts/:postId — get a single post by ID */
+export function postUrl(baseUrl: string, postId: string): string {
+  return url(baseUrl, `${API}/posts/${encodeURIComponent(postId)}`);
+}
+
 // ── Teams ────────────────────────────────────────────────────────────────────
 
 /** GET /api/v4/users/me/teams — list teams the authenticated user belongs to */

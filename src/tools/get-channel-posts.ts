@@ -2,6 +2,7 @@ import type { Config } from "../config.js";
 import { createClient, errorContent } from "../utils.js";
 import { isMcpError } from "../errors.js";
 import type { ChatOpsPost } from "../types.js";
+import { resolvePostAuthors, type UserMap } from "../user-resolver.js";
 
 export interface GetChannelPostsInput {
   channelId: string;
@@ -9,12 +10,13 @@ export interface GetChannelPostsInput {
   perPage?: number;
 }
 
-function formatPost(p: ChatOpsPost, index: number): string {
+function formatPost(p: ChatOpsPost, index: number, users: UserMap): string {
+  const author = users.get(p.userId) ?? `\`${p.userId}\``;
   const isReply = p.rootId !== null;
   const prefix = isReply ? "  ↳" : `${index + 1}.`;
   const lines = [
-    `${prefix} **[${p.createdAt.slice(0, 16)}]** \`${p.userId}\``,
-    `${isReply ? "   " : "   "}${p.message.replace(/\n/g, " ").slice(0, 300)}${p.message.length > 300 ? "…" : ""}`,
+    `${prefix} **[${p.createdAt.slice(0, 16)}]** ${author}`,
+    `${isReply ? "   " : "   "}${p.message.replace(/\n/g, " ").slice(0, 200)}${p.message.length > 200 ? "…" : ""}`,
   ];
   if (p.fileIds.length) {
     lines.push(`   📎 ${p.fileIds.length} attachment(s)`);
@@ -41,10 +43,16 @@ export async function handleGetChannelPosts(
       };
     }
 
+    // Batch-resolve userIds → @usernames
+    const users = await resolvePostAuthors(client, postList.posts);
+
     const lines = [
       `## Posts in channel \`${input.channelId}\` (${postList.totalCount} shown)`,
       "",
-      ...postList.posts.map(formatPost),
+      ...postList.posts.map((p, i) => formatPost(p, i, users)),
+      "",
+      "---",
+      "💡 Use `chatops_get_thread` with a post ID to see the full thread.",
     ];
 
     return { content: [{ type: "text", text: lines.join("\n") }] };

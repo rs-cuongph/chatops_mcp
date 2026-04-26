@@ -4,8 +4,19 @@
 // These are intentionally free of ChatOps API internals.
 // ---------------------------------------------------------------------------
 
-// ── Teams ───────────────────────────────────────────────────────────────────
+// ── Users ───────────────────────────────────────────────────────────────────
 
+export interface ChatOpsUser {
+  id: string;
+  username: string;       // @-mention handle
+  displayName: string;    // "First Last" or nickname
+  email: string;
+  position: string;
+  roles: string[];
+  createdAt: string;      // ISO 8601
+}
+
+// ── Teams ───────────────────────────────────────────────────────────────────
 // ── Auth / Session ───────────────────────────────────────────────────────────
 
 /** Shape of a single Playwright-persisted cookie. */

@@ -4,6 +4,23 @@
 // NEVER use these types outside http-client.ts and mappers.ts.
 // ---------------------------------------------------------------------------
 
+// ── Users ───────────────────────────────────────────────────────────────────
+
+export interface ChatOpsRawUser {
+  id: string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  nickname: string;
+  position: string;
+  roles: string;          // e.g. "system_admin system_user"
+  locale: string;
+  create_at: number;
+  update_at: number;
+  delete_at: number;
+}
+
 // ── Teams ───────────────────────────────────────────────────────────────────
 
 export interface ChatOpsRawTeam {
