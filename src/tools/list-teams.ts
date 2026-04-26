@@ -4,8 +4,7 @@ import { isMcpError } from "../errors.js";
 import type { ChatOpsTeam } from "../types.js";
 
 export interface ListTeamsInput {
-  page?: number;
-  perPage?: number;
+  // No pagination — /api/v4/users/me/teams returns all teams at once
 }
 
 function formatTeam(t: ChatOpsTeam, index: number): string {
@@ -19,16 +18,16 @@ function formatTeam(t: ChatOpsTeam, index: number): string {
 }
 
 export async function handleListTeams(
-  input: ListTeamsInput,
+  _input: ListTeamsInput,
   cfg: Config
 ): Promise<{ content: Array<{ type: "text"; text: string }>; isError?: boolean }> {
   const client = await createClient(cfg);
   try {
-    const teams = await client.getTeams(input.page ?? 0, input.perPage ?? 60);
+    const teams = await client.getTeams();
 
     if (teams.length === 0) {
       return {
-        content: [{ type: "text", text: "No teams found." }],
+        content: [{ type: "text", text: "No teams found. You may not be a member of any team yet." }],
       };
     }
 

@@ -185,6 +185,30 @@ npx tsc --noEmit       # type check
 npm run build          # compile to dist/
 ```
 
+### Testing with MCP Inspector
+
+[MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector) lets you browse and call tools interactively in a browser UI.
+
+> **Important**: The Inspector **spawns the server itself** — do not run `npm run dev` separately.
+
+```bash
+# From the project directory (recommended)
+npx @modelcontextprotocol/inspector tsx src/server.ts
+
+# Or using the compiled build
+npm run build
+npx @modelcontextprotocol/inspector node dist/server.js
+```
+
+Then open **http://localhost:5173** in your browser.
+
+The Inspector will:
+1. Launch `tsx src/server.ts` as a child process (stdio transport)
+2. Load env vars from `.env` automatically (via `import "dotenv/config"` in server.ts)
+3. List all 16 tools — click any tool to fill inputs and execute it
+
+> If you see session errors, run `npm run chatops-auth-check` first to ensure your session is still valid.
+
 ## License
 
 MIT

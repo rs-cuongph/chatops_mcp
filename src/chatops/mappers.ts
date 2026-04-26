@@ -62,6 +62,9 @@ export function mapFileInfo(raw: ChatOpsRawFileInfo): ChatOpsFileInfo {
     size: raw.size,
     sizeFormatted: formatFileSize(raw.size),
     mimeType: raw.mime_type,
+    postId: raw.post_id,
+    channelId: raw.channel_id,
+    createdAt: raw.create_at ? formatTimestamp(raw.create_at) : undefined,
   };
 }
 

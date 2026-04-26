@@ -11,9 +11,9 @@ function url(base: string, path: string): string {
 
 // ── Teams ────────────────────────────────────────────────────────────────────
 
-/** GET /api/v4/teams — list all teams the token can access */
+/** GET /api/v4/users/me/teams — list teams the authenticated user belongs to */
 export function teamsUrl(baseUrl: string): string {
-  return url(baseUrl, `${API}/teams`);
+  return url(baseUrl, `${API}/users/me/teams`);
 }
 
 /** GET /api/v4/teams/:teamId */
@@ -75,6 +75,21 @@ export function pinnedPostsUrl(baseUrl: string, channelId: string): string {
 /** POST /api/v4/posts — create a post */
 export function postsUrl(baseUrl: string): string {
   return url(baseUrl, `${API}/posts`);
+}
+
+/** POST /api/v4/teams/:teamId/posts/search — full-text search of posts */
+export function searchPostsUrl(baseUrl: string, teamId: string): string {
+  return url(baseUrl, `${API}/teams/${encodeURIComponent(teamId)}/posts/search`);
+}
+
+/** GET /api/v4/files/:fileId/info — get metadata of a single uploaded file */
+export function fileInfoUrl(baseUrl: string, fileId: string): string {
+  return url(baseUrl, `${API}/files/${encodeURIComponent(fileId)}/info`);
+}
+
+/** POST /api/v4/teams/:teamId/files/search — search files/attachments in a team */
+export function searchFilesUrl(baseUrl: string, teamId: string): string {
+  return url(baseUrl, `${API}/teams/${encodeURIComponent(teamId)}/files/search`);
 }
 
 // ── Files ────────────────────────────────────────────────────────────────────

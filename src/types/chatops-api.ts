@@ -65,6 +65,7 @@ export interface ChatOpsRawPostList {
 export interface ChatOpsRawFileInfo {
   id: string;
   user_id: string;
+  post_id?: string;
   channel_id?: string;
   name: string;
   extension: string;
@@ -86,6 +87,20 @@ export interface ChatOpsRawReaction {
   post_id: string;
   emoji_name: string;
   create_at: number;   // Unix ms
+}
+
+// ── Post Search ───────────────────────────────────────────────────────────────
+
+export interface ChatOpsRawPostSearchResults {
+  order: string[];
+  posts: Record<string, ChatOpsRawPost>;
+}
+
+// ── File Search ───────────────────────────────────────────────────────────────
+
+export interface ChatOpsRawFileSearchResults {
+  order?: string[];
+  file_infos?: Record<string, ChatOpsRawFileInfo>;
 }
 
 // ── Emoji ────────────────────────────────────────────────────────────────────

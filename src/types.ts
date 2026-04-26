@@ -89,6 +89,19 @@ export interface ChatOpsFileInfo {
   size: number;
   sizeFormatted: string;   // e.g. "2.3 MB"
   mimeType: string;
+  postId?: string;         // post this file is attached to (if known)
+  channelId?: string;
+  createdAt?: string;      // ISO 8601
+}
+
+export interface ChatOpsPostSearchResults {
+  total: number;
+  posts: ChatOpsPost[];
+}
+
+export interface ChatOpsFileSearchResults {
+  total: number;
+  files: ChatOpsFileInfo[];
 }
 
 export interface ChatOpsFileUploadResult {

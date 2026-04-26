@@ -25,6 +25,10 @@ import { handleSendMessageWithFiles } from "./tools/send-message-with-files.js";
 import { handleGetReactions } from "./tools/get-reactions.js";
 import { handleAddReaction } from "./tools/add-reaction.js";
 import { handleGetEmoji } from "./tools/get-emoji.js";
+import { handleSearchPosts } from "./tools/search-posts.js";
+import { handleGetFileInfo } from "./tools/get-file-info.js";
+import { handleSearchFiles } from "./tools/search-files.js";
+import { handleSearchLinks } from "./tools/search-links.js";
 
 // ---------------------------------------------------------------------------
 // MCP server factory
@@ -40,13 +44,8 @@ function createMcpServer(): McpServer {
 
   server.tool(
     "chatops_list_teams",
-    "List all ChatOps teams accessible to the authenticated user. Returns team ID, display name, slug, type, and description.",
-    {
-      page: z.number().int().min(0).optional().default(0)
-        .describe("0-based page number (default 0)."),
-      perPage: z.number().int().min(1).max(200).optional().default(60)
-        .describe("Number of teams per page (1–200, default 60)."),
-    },
+    "List all ChatOps teams the authenticated user is a member of. Returns team ID, display name, slug, type, and description.",
+    {},
     async (input) => handleListTeams(input, config)
   );
 
@@ -242,6 +241,67 @@ Built-in system emoji (e.g. :thumbsup:, :heart:) are not stored as custom emoji 
         .describe("Emoji slug without colons — used when emojiId is not provided."),
     },
     async (input) => handleGetEmoji(input, config)
+  );
+
+  // ── Search ────────────────────────────────────────────────────────────────────
+
+  server.tool(
+    "chatops_search_posts",
+    `Full-text search of posts in a ChatOps team.
+
+Supports Mattermost search syntax:
+- Phrase search: "exact phrase"
+- Channel filter: in:channel-name
+- Author filter: from:username
+- Date filter: on:YYYY-MM-DD, before:YYYY-MM-DD, after:YYYY-MM-DD`,
+    {
+      teamId: z.string().min(1).describe("ChatOps team ID to search within."),
+      terms: z.string().min(1).describe("Search query. Supports Mattermost search syntax."),
+      isOrSearch: z.boolean().optional().default(false)
+        .describe("If true, terms are OR-ed instead of AND-ed (default false)."),
+      page: z.number().int().min(0).optional().default(0).describe("0-based page (default 0)."),
+      perPage: z.number().int().min(1).max(60).optional().default(20).describe("Results per page (default 20, max 60)."),
+    },
+    async (input) => handleSearchPosts(input, config)
+  );
+
+  server.tool(
+    "chatops_get_file_info",
+    "Get metadata (name, size, MIME type, upload date, linked post/channel) for a specific file attachment by its ID.",
+    {
+      fileId: z.string().min(1).describe("ChatOps file ID to look up."),
+    },
+    async (input) => handleGetFileInfo(input, config)
+  );
+
+  server.tool(
+    "chatops_search_files",
+    `Search file attachments in a ChatOps team by file name or extension.
+
+Returns file metadata including name, size, MIME type, and the post/channel it was attached to.`,
+    {
+      teamId: z.string().min(1).describe("ChatOps team ID to search within."),
+      terms: z.string().min(1).describe("Search term — matched against file name."),
+      page: z.number().int().min(0).optional().default(0).describe("0-based page (default 0)."),
+      perPage: z.number().int().min(1).max(60).optional().default(20).describe("Results per page (default 20)."),
+    },
+    async (input) => handleSearchFiles(input, config)
+  );
+
+  server.tool(
+    "chatops_search_links",
+    `Find posts that contain shared URLs/links in a ChatOps team.
+
+Optionally narrow the search by providing a keyword (e.g. a domain like "github.com" or a topic).
+Returns matching posts with all extracted URLs highlighted.`,
+    {
+      teamId: z.string().min(1).describe("ChatOps team ID to search within."),
+      term: z.string().optional()
+        .describe("Optional keyword to narrow results (e.g. \"github.com\", \"confluence\")."),
+      page: z.number().int().min(0).optional().default(0).describe("0-based page (default 0)."),
+      perPage: z.number().int().min(1).max(60).optional().default(20).describe("Results per page (default 20)."),
+    },
+    async (input) => handleSearchLinks(input, config)
   );
 
   return server;
