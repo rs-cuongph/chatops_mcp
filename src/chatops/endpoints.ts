@@ -83,3 +83,37 @@ export function postsUrl(baseUrl: string): string {
 export function filesUrl(baseUrl: string): string {
   return url(baseUrl, `${API}/files`);
 }
+
+// ── Reactions ────────────────────────────────────────────────────────────────
+
+/** GET /api/v4/posts/:postId/reactions — list reactions on a post */
+export function postReactionsUrl(baseUrl: string, postId: string): string {
+  return url(baseUrl, `${API}/posts/${encodeURIComponent(postId)}/reactions`);
+}
+
+/** POST /api/v4/reactions — add a reaction to a post */
+export function reactionsUrl(baseUrl: string): string {
+  return url(baseUrl, `${API}/reactions`);
+}
+
+/** GET /api/v4/users/me — get the authenticated user */
+export function currentUserUrl(baseUrl: string): string {
+  return url(baseUrl, `${API}/users/me`);
+}
+
+// ── Emoji ────────────────────────────────────────────────────────────────────
+
+/** GET /api/v4/emoji — list all custom emoji (paginated) */
+export function emojiListUrl(baseUrl: string): string {
+  return url(baseUrl, `${API}/emoji`);
+}
+
+/** GET /api/v4/emoji/:emojiId — get custom emoji by ID */
+export function emojiUrl(baseUrl: string, emojiId: string): string {
+  return url(baseUrl, `${API}/emoji/${encodeURIComponent(emojiId)}`);
+}
+
+/** GET /api/v4/emoji/name/:emojiName — get custom emoji by name/slug */
+export function emojiByNameUrl(baseUrl: string, emojiName: string): string {
+  return url(baseUrl, `${API}/emoji/name/${encodeURIComponent(emojiName)}`);
+}

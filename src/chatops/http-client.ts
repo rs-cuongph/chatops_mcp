@@ -9,6 +9,8 @@ import type {
   ChatOpsRawPost,
   ChatOpsRawPostList,
   ChatOpsRawFileUploadResponse,
+  ChatOpsRawReaction,
+  ChatOpsRawEmoji,
 } from "../types/chatops-api.js";
 import type {
   ChatOpsTeam,
@@ -16,6 +18,8 @@ import type {
   ChatOpsPost,
   ChatOpsPostList,
   ChatOpsFileUploadResult,
+  ChatOpsReaction,
+  ChatOpsEmoji,
 } from "../types.js";
 import { authError, chatopsHttpError } from "../errors.js";
 import {
@@ -31,6 +35,12 @@ import {
   pinnedPostsUrl,
   postsUrl,
   filesUrl,
+  postReactionsUrl,
+  reactionsUrl,
+  currentUserUrl,
+  emojiListUrl,
+  emojiUrl,
+  emojiByNameUrl,
 } from "./endpoints.js";
 import {
   mapTeam,
@@ -38,6 +48,8 @@ import {
   mapPost,
   mapPostList,
   mapFileUploadResult,
+  mapReaction,
+  mapEmoji,
 } from "./mappers.js";
 
 export class ChatOpsHttpClient {
@@ -181,7 +193,58 @@ export class ChatOpsHttpClient {
     return mapFileUploadResult(raw.file_infos[0]);
   }
 
+  // ── Reactions ─────────────────────────────────────────────────────────────
+
+  async getCurrentUserId(): Promise<string> {
+    const endpoint = currentUserUrl(this.baseUrl);
+    const res = await this.http.get<{ id: string }>(endpoint);
+    this.assertOk(res.status, endpoint, res.data);
+    return (res.data as { id: string }).id;
+  }
+
+  async getPostReactions(postId: string): Promise<ChatOpsReaction[]> {
+    const endpoint = postReactionsUrl(this.baseUrl, postId);
+    const res = await this.http.get<ChatOpsRawReaction[]>(endpoint);
+    this.assertOk(res.status, endpoint, res.data);
+    return (res.data as ChatOpsRawReaction[]).map(mapReaction);
+  }
+
+  async addReaction(userId: string, postId: string, emojiName: string): Promise<ChatOpsReaction> {
+    const endpoint = reactionsUrl(this.baseUrl);
+    const res = await this.http.post<ChatOpsRawReaction>(endpoint, {
+      user_id: userId,
+      post_id: postId,
+      emoji_name: emojiName,
+    });
+    this.assertOk(res.status, endpoint, res.data);
+    return mapReaction(res.data as ChatOpsRawReaction);
+  }
+
+  // ── Emoji ──────────────────────────────────────────────────────────────────
+
+  async getEmoji(emojiId: string): Promise<ChatOpsEmoji> {
+    const endpoint = emojiUrl(this.baseUrl, emojiId);
+    const res = await this.http.get<ChatOpsRawEmoji>(endpoint);
+    this.assertOk(res.status, endpoint, res.data);
+    return mapEmoji(res.data as ChatOpsRawEmoji);
+  }
+
+  async getEmojiByName(emojiName: string): Promise<ChatOpsEmoji> {
+    const endpoint = emojiByNameUrl(this.baseUrl, emojiName);
+    const res = await this.http.get<ChatOpsRawEmoji>(endpoint);
+    this.assertOk(res.status, endpoint, res.data);
+    return mapEmoji(res.data as ChatOpsRawEmoji);
+  }
+
+  async listEmoji(page = 0, perPage = 200): Promise<ChatOpsEmoji[]> {
+    const endpoint = `${emojiListUrl(this.baseUrl)}?page=${page}&per_page=${perPage}&sort=name`;
+    const res = await this.http.get<ChatOpsRawEmoji[]>(endpoint);
+    this.assertOk(res.status, endpoint, res.data);
+    return (res.data as ChatOpsRawEmoji[]).map(mapEmoji);
+  }
+
   // ── Private helpers ────────────────────────────────────────────────────────
+
 
   private checkAuthFailure(status: number): void {
     if (status === 401 || status === 403) {

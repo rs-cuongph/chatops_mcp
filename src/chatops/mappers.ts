@@ -7,6 +7,8 @@ import type {
   ChatOpsRawPost,
   ChatOpsRawPostList,
   ChatOpsRawFileInfo,
+  ChatOpsRawReaction,
+  ChatOpsRawEmoji,
 } from "../types/chatops-api.js";
 import type {
   ChatOpsTeam,
@@ -15,6 +17,8 @@ import type {
   ChatOpsPostList,
   ChatOpsFileInfo,
   ChatOpsFileUploadResult,
+  ChatOpsReaction,
+  ChatOpsEmoji,
 } from "../types.js";
 import { formatTimestamp, formatFileSize, channelTypeLabel, teamTypeLabel } from "../utils.js";
 
@@ -98,5 +102,28 @@ export function mapPostList(raw: ChatOpsRawPostList): ChatOpsPostList {
     order: raw.order ?? [],
     posts,
     totalCount: posts.length,
+  };
+}
+
+// ── Reactions ─────────────────────────────────────────────────────────────────
+
+export function mapReaction(raw: ChatOpsRawReaction): ChatOpsReaction {
+  return {
+    userId: raw.user_id,
+    postId: raw.post_id,
+    emojiName: raw.emoji_name,
+    createdAt: formatTimestamp(raw.create_at),
+  };
+}
+
+// ── Emoji ─────────────────────────────────────────────────────────────
+
+export function mapEmoji(raw: ChatOpsRawEmoji): ChatOpsEmoji {
+  return {
+    id: raw.id,
+    creatorId: raw.creator_id,
+    name: raw.name,
+    createdAt: formatTimestamp(raw.create_at),
+    updatedAt: formatTimestamp(raw.update_at),
   };
 }

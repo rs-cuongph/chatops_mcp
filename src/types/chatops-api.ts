@@ -78,3 +78,23 @@ export interface ChatOpsRawFileUploadResponse {
   file_infos: ChatOpsRawFileInfo[];
   client_ids?: string[];
 }
+
+// ── Reactions ────────────────────────────────────────────────────────────────
+
+export interface ChatOpsRawReaction {
+  user_id: string;
+  post_id: string;
+  emoji_name: string;
+  create_at: number;   // Unix ms
+}
+
+// ── Emoji ────────────────────────────────────────────────────────────────────
+
+export interface ChatOpsRawEmoji {
+  id: string;
+  creator_id: string;
+  name: string;        // emoji slug, used in :name:
+  create_at: number;   // Unix ms
+  update_at: number;   // Unix ms
+  delete_at: number;   // 0 if active
+}

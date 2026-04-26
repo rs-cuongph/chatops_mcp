@@ -22,6 +22,9 @@ import { handleSendMessage } from "./tools/send-message.js";
 import { handleReplyToThread } from "./tools/reply-to-thread.js";
 import { handleUploadFile } from "./tools/upload-file.js";
 import { handleSendMessageWithFiles } from "./tools/send-message-with-files.js";
+import { handleGetReactions } from "./tools/get-reactions.js";
+import { handleAddReaction } from "./tools/add-reaction.js";
+import { handleGetEmoji } from "./tools/get-emoji.js";
 
 // ---------------------------------------------------------------------------
 // MCP server factory
@@ -195,6 +198,50 @@ Workflow:
         .describe("Optional: reply to this post ID (creates a thread reply with attachments)."),
     },
     async (input) => handleSendMessageWithFiles(input, config)
+  );
+
+  // ── Reactions ────────────────────────────────────────────────────────────
+
+  server.tool(
+    "chatops_get_reactions",
+    "List all emoji reactions on a ChatOps post. Returns a grouped summary by emoji and a full detail table with user IDs and timestamps.",
+    {
+      postId: z.string().min(1).describe("ChatOps post ID to fetch reactions for."),
+    },
+    async (input) => handleGetReactions(input, config)
+  );
+
+  server.tool(
+    "chatops_add_reaction",
+    `Add an emoji reaction to a ChatOps post on behalf of the authenticated user.
+
+The emoji name must be a standard Mattermost/ChatOps emoji slug (e.g. "thumbsup", "heart", "tada").
+Do not include colons — use "thumbsup" not ":thumbsup:".`,
+    {
+      postId: z.string().min(1).describe("ChatOps post ID to react to."),
+      emojiName: z.string().min(1)
+        .describe("Emoji slug without colons (e.g. \"thumbsup\", \"heart\", \"tada\")."),
+    },
+    async (input) => handleAddReaction(input, config)
+  );
+
+  server.tool(
+    "chatops_get_emoji",
+    `Look up custom emoji in ChatOps.
+
+Lookup modes (mutually exclusive, checked in this order):
+- By emojiId: provide emojiId to fetch one specific emoji.
+- By emojiName: provide emojiName (slug, no colons) to fetch by name.
+- List all: omit both to list all custom emoji sorted by name.
+
+Built-in system emoji (e.g. :thumbsup:, :heart:) are not stored as custom emoji and won't appear in the list.`,
+    {
+      emojiId: z.string().optional()
+        .describe("Custom emoji ID (preferred lookup)."),
+      emojiName: z.string().optional()
+        .describe("Emoji slug without colons — used when emojiId is not provided."),
+    },
+    async (input) => handleGetEmoji(input, config)
   );
 
   return server;

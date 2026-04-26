@@ -69,3 +69,22 @@ export interface ChatOpsFileUploadResult {
   sizeFormatted: string;
   mimeType: string;
 }
+
+// ── Reactions ────────────────────────────────────────────────────────────────
+
+export interface ChatOpsReaction {
+  userId: string;
+  postId: string;
+  emojiName: string;
+  createdAt: string;   // ISO 8601
+}
+
+// ── Emoji ────────────────────────────────────────────────────────────────────
+
+export interface ChatOpsEmoji {
+  id: string;
+  creatorId: string;
+  name: string;        // emoji slug — use as :name: in messages
+  createdAt: string;   // ISO 8601
+  updatedAt: string;   // ISO 8601
+}
