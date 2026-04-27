@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "chatops-mcp": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "src/server.ts"
+      ]
+    }
+  }
+}
