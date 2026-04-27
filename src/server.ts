@@ -31,6 +31,7 @@ import { handleSearchLinks } from "./tools/search-links.js";
 import { handleGetUser } from "./tools/get-user.js";
 import { handleSearchUsers } from "./tools/search-users.js";
 import { handleGetPost } from "./tools/get-post.js";
+import { handleSmartSearch } from "./tools/smart-search.js";
 
 // ---------------------------------------------------------------------------
 // MCP server factory
@@ -352,6 +353,39 @@ Returns matching posts with all extracted URLs highlighted.`,
       perPage: z.number().int().min(1).max(60).optional().default(20).describe("Results per page (default 20)."),
     },
     async (input) => handleSearchLinks(input, config)
+  );
+
+  // ── Smart Search (composite) ────────────────────────────────────────────
+
+  server.tool(
+    "chatops_smart_search",
+    `All-in-one search: resolves team/channel/user by name and searches posts — no need to call list_teams, search_channels, or search_users first.
+
+Accepts human-readable names instead of IDs:
+- teamName: "Đà Nẵng" (required)
+- channelName: "CHECK.OFF.LATER" or "checkoff-later" (optional)
+- userName: email like "quangdt@runsystem.net" or display name (optional)
+- dateFrom / dateTo: "2026-04-01" / "2026-04-30" (optional, inclusive range)
+- keywords: additional text to search for (optional)
+
+Internally resolves all names → IDs in parallel, then runs the search.
+Use this as the default search tool when the user provides names, not IDs.`,
+    {
+      teamName: z.string().min(1).describe("Team name or display name (e.g. 'Đà Nẵng')."),
+      channelName: z.string().optional()
+        .describe("Channel display name or slug (e.g. 'CHECK.OFF.LATER' or 'checkoff-later')."),
+      userName: z.string().optional()
+        .describe("User email, username, or display name to search for their posts."),
+      dateFrom: z.string().optional()
+        .describe("Start date (YYYY-MM-DD). Posts on or after this date."),
+      dateTo: z.string().optional()
+        .describe("End date (YYYY-MM-DD). Posts on or before this date."),
+      keywords: z.string().optional()
+        .describe("Additional search keywords (e.g. 'xin phép', 'nghỉ')."),
+      page: z.number().int().min(0).optional().default(0).describe("0-based page (default 0)."),
+      perPage: z.number().int().min(1).max(60).optional().default(20).describe("Results per page (default 20)."),
+    },
+    async (input) => handleSmartSearch(input, config)
   );
 
   return server;
