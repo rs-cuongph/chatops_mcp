@@ -1,3 +1,4 @@
+import "./bootstrap.js"; // loads .env + resolves CHATOPS_SESSION_FILE path
 import { z } from "zod";
 import { configError } from "./errors.js";
 

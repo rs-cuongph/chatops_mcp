@@ -1,14 +1,3 @@
 {
-  "mcpServers": {
-    "chatops-mcp": {
-      "command": "npx",
-      "args": [
-        "tsx",
-        "src/server.ts"
-      ],
-      "env": {
-        "CHATOPS_URL": "https://chat.runsystem.vn"
-      }
-    }
-  }
+  "mcpServers": {}
 }
