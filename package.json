@@ -2,6 +2,16 @@
   "name": "@cuongph.dev/chatops-mcp",
   "version": "0.1.1",
   "description": "MCP server for ChatOps — SSO session auth via Playwright, read teams/channels/messages, send messages with attachments",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cuongph-dev-work/chatops_mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cuongph-dev-work/chatops_mcp/issues"
+  },
+  "homepage": "https://github.com/cuongph-dev-work/chatops_mcp#readme",
+  "author": "cuongph-dev-work",
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=20"
