@@ -18,11 +18,11 @@ const BASE = "https://chatops.example.com";
 
 describe("endpoints", () => {
   it("teamsUrl", () => {
-    expect(teamsUrl(BASE)).toBe("https://chatops.example.com/api/v4/teams");
+    expect(teamsUrl(BASE)).toBe("https://chatops.example.com/api/v4/users/me/teams");
   });
 
   it("teamsUrl strips trailing slash", () => {
-    expect(teamsUrl(`${BASE}/`)).toBe("https://chatops.example.com/api/v4/teams");
+    expect(teamsUrl(`${BASE}/`)).toBe("https://chatops.example.com/api/v4/users/me/teams");
   });
 
   it("teamUrl", () => {

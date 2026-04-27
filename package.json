@@ -18,6 +18,8 @@
     "dist/cli",
     "dist/tools",
     "dist/types",
+    "dist/bootstrap.js",
+    "dist/bootstrap.d.ts",
     "dist/config.js",
     "dist/config.d.ts",
     "dist/errors.js",
@@ -28,6 +30,8 @@
     "dist/types.d.ts",
     "dist/utils.js",
     "dist/utils.d.ts",
+    "dist/user-resolver.js",
+    "dist/user-resolver.d.ts",
     "README.md",
     "LICENSE"
   ],
