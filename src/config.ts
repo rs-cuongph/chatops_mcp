@@ -1,4 +1,4 @@
-import "./bootstrap.js"; // loads .env + resolves CHATOPS_SESSION_FILE path
+import { fromRoot } from "./bootstrap.js"; // loads .env + provides path resolver
 import { z } from "zod";
 import { configError } from "./errors.js";
 
@@ -22,7 +22,7 @@ const schema = z.object({
 // ---------------------------------------------------------------------------
 
 const DEFAULTS = {
-  CHATOPS_SESSION_FILE: ".chatops/session.json", // resolved to absolute by bootstrap.ts
+  CHATOPS_SESSION_FILE: fromRoot(".chatops/session.json"), // absolute path
   CHATOPS_VALIDATE_PATH: "/api/v4/users/me",
   PLAYWRIGHT_HEADLESS: false,
   PLAYWRIGHT_BROWSER: "chromium" as const,
