@@ -5,7 +5,10 @@
       "args": [
         "tsx",
         "src/server.ts"
-      ]
+      ],
+      "env": {
+        "CHATOPS_URL": "https://chat.runsystem.vn"
+      }
     }
   }
 }
