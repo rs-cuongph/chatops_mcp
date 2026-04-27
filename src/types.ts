@@ -44,6 +44,7 @@ export interface SessionFile {
 /** Extracted, ready-to-use form of the session for HTTP calls. */
 export interface SessionCookies {
   cookieHeader: string;   // e.g. "MMAUTHTOKEN=abc; MMUSERID=xyz"
+  csrfToken?: string;     // MMCSRF cookie value — required by Mattermost for POST/PUT/DELETE
 }
 
 export interface ChatOpsTeam {

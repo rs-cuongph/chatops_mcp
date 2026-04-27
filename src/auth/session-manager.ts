@@ -20,7 +20,10 @@ export function extractCookies(session: SessionFile, baseUrl: string): SessionCo
 
   const cookieHeader = matched.map((c) => `${c.name}=${c.value}`).join("; ");
 
-  return { cookieHeader };
+  // Mattermost requires X-CSRF-Token header (value = MMCSRF cookie) for all write requests
+  const csrfToken = matched.find((c) => c.name === "MMCSRF")?.value;
+
+  return { cookieHeader, csrfToken };
 }
 
 // ---------------------------------------------------------------------------

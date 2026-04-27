@@ -32,11 +32,16 @@ export class ChatOpsHttpClient {
 
   constructor(baseUrl: string, cookies: SessionCookies) {
     this.baseUrl = baseUrl.replace(/\/$/, "");
-    this.http = axios.create({
-      headers: { Cookie: cookies.cookieHeader, Accept: "application/json", "Content-Type": "application/json" },
-      maxRedirects: 0,
-      validateStatus: () => true,
-    });
+    const headers: Record<string, string> = {
+      Cookie: cookies.cookieHeader,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    };
+    // Mattermost requires X-CSRF-Token for POST/PUT/DELETE requests
+    if (cookies.csrfToken) {
+      headers["X-CSRF-Token"] = cookies.csrfToken;
+    }
+    this.http = axios.create({ headers, maxRedirects: 0, validateStatus: () => true });
   }
 
   // ── Users ────────────────────────────────────────────────────────────────────
