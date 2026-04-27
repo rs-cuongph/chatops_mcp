@@ -2,48 +2,43 @@
 
 ## When to Use
 
-Use when the user knows part of a channel name and wants to find it without scrolling through all channels. More targeted than `chatops_list_channels` in large teams.
+Search for ChatOps channels by name within a specific team. Use when you know part of a channel's name but not its ID.
 
 ## Input
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `teamId` | string | ✅ | — | ChatOps team ID to search within |
-| `term` | string | ✅ | — | Search term matched against channel name and display name |
+| `teamId` | string | ✅ | — | ChatOps team ID |
+| `term` | string | ✅ | — | Search term matched against channel name |
 
 ## Output
 
-Matching channels with type icons, IDs, message count, and purpose.
-
 ```
-## Channels matching "release" (2)
+## Channels matching "dev" (2)
 
-1. # **Release Management** (`release-mgmt`)
-   - ID: `ch_release`
-   - Type: public | Messages: 302
-   - Purpose: Release coordination
+1. # **DevOps** (`devops`)
+   - ID: `ch_aaa`
+   - Type: public | Messages: 890
 
-2. 🔒 **Release Internal** (`release-internal`)
-   - ID: `ch_relint`
-   - Type: private | Messages: 45
+2. 🔒 **DevOps Internal** (`devops-internal`)
+   - ID: `ch_bbb`
+   - Type: private | Messages: 234
+
+---
+💡 Use `chatops_get_channel_posts` with a channel ID to read messages, or `chatops_get_pinned_posts` for pinned content.
 ```
 
 ## Error Cases
 
 | Condition | Message |
 |-----------|---------|
-| No matches | `No channels found matching "<term>" in team \`<teamId>\`.` |
-| Invalid team | `Failed to search channels: ChatOps HTTP 404 ...` |
+| No results | `No channels found matching "<term>" in team \`<id>\`.` |
+| Invalid team | `Failed to search channels: ChatOps HTTP 403/404` |
 | Invalid token | `ChatOps returned 401/403 — check that CHATOPS_TOKEN is valid.` |
 
 ## Examples
 
-**Search for release-related channels:**
+**Search for channels:**
 ```
-chatops_search_channels teamId="abc123" term="release"
-```
-
-**Find the incident channel:**
-```
-chatops_search_channels teamId="abc123" term="incident"
+chatops_search_channels teamId="abc123xyz" term="devops"
 ```

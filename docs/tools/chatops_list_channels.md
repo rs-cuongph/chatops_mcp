@@ -2,7 +2,7 @@
 
 ## When to Use
 
-Use to list all public channels available in a given team. The standard entry point for channel discovery. For private channels the token must have membership access.
+List all public channels in a ChatOps team. Returns channel ID, name, type, message count, and purpose. Use this after `chatops_list_teams` to explore a team's channels and find the right channel ID.
 
 ## Input
 
@@ -10,41 +10,46 @@ Use to list all public channels available in a given team. The standard entry po
 |-----------|------|----------|---------|-------------|
 | `teamId` | string | ✅ | — | ChatOps team ID |
 | `page` | integer | No | `0` | 0-based page number |
-| `perPage` | integer | No | `60` | Channels per page (1–200) |
+| `perPage` | integer | No | `60` | Channels per page |
 
 ## Output
 
-A Markdown list of channels with icons indicating type (🔒 = private, # = public).
-
 ```
-## Channels in team `abc123` (5)
+## Channels in team `abc123xyz` (3)
 
-1. # **General** (`general`)
-   - ID: `ch_general`
-   - Type: public | Messages: 1234
+1. # **Town Square** (`town-square`)
+   - ID: `ch_aaa`
+   - Type: public | Messages: 1,234
 
-2. 🔒 **Engineering Private** (`engineering-private`)
-   - ID: `ch_engprivate`
-   - Type: private | Messages: 89
-   - Purpose: Internal engineering discussions
+2. # **Off-Topic** (`off-topic`)
+   - ID: `ch_bbb`
+   - Type: public | Messages: 567
+   - Purpose: For non-work related discussions
+
+3. 🔒 **DevOps Internal** (`devops-internal`)
+   - ID: `ch_ccc`
+   - Type: private | Messages: 890
+
+---
+💡 Use `chatops_get_channel_posts` with a channel ID to read messages, or `chatops_get_channel` for full channel details.
 ```
 
 ## Error Cases
 
 | Condition | Message |
 |-----------|---------|
-| Invalid team ID | `Failed to list channels: ChatOps HTTP 404 ...` |
-| No channels | `No channels found in team \`<teamId>\`.` |
+| Invalid team | `Failed to list channels: ChatOps HTTP 403/404` |
+| No channels | `No channels found in team \`<id>\`.` |
 | Invalid token | `ChatOps returned 401/403 — check that CHATOPS_TOKEN is valid.` |
 
 ## Examples
 
-**List channels in a team:**
+**List all channels:**
 ```
 chatops_list_channels teamId="abc123xyz"
 ```
 
-**Paginate (second page):**
+**Paginate:**
 ```
-chatops_list_channels teamId="abc123xyz" page=1 perPage=30
+chatops_list_channels teamId="abc123xyz" page=1 perPage=20
 ```

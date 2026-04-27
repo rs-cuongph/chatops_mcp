@@ -2,47 +2,45 @@
 
 ## When to Use
 
-Use to read the full conversation thread rooted at a given post. Returns the root post and all replies in chronological order. Useful when a user wants to follow a discussion without noise from the rest of the channel.
+Get all posts in a thread rooted at a given post ID — the root post and all replies in chronological order. Use this when you see a post with replies and want to read the full conversation context.
 
 ## Input
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `postId` | string | ✅ | — | ID of the **root post** of the thread |
+| `postId` | string | ✅ | — | ID of the root post of the thread |
 
 ## Output
 
 ```
-## Thread (`post_root123`) — 4 message(s)
+## Thread (`post_root123`) — 3 message(s)
 
-📌 Root — `post_root123` | **2024-03-15T09:00** | `user_alice`
-Anyone seen the deploy fail on staging?
-
----
-  ↳ Reply — `post_reply1` | **2024-03-15T09:05** | `user_bob`
-Yes, looks like a DB migration issue. Checking now.
+📌 Root — `post_root123` | **2024-04-26 14:30** | @john.doe
+Deployment to production started. ETA 15 minutes.
 
 ---
-  ↳ Reply — `post_reply2` | **2024-03-15T09:12** | `user_alice`
-Found it — missing index on the users table. Fix pushed.
-📎 fix-migration.sql (2.1 KB)
+  ↳ Reply — `post_reply1` | **2024-04-26 14:35** | @jane.smith
+  Ready on QA side. Go for it!
 
 ---
-  ↳ Reply — `post_reply3` | **2024-03-15T09:20** | `user_bob`
-Confirmed fixed. Deploying again.
+  ↳ Reply — `post_reply2` | **2024-04-26 14:50** | @john.doe
+  Deploy complete ✅ v2.4.0 is live.
+
+---
+💡 Use `chatops_reply_to_thread` to add a reply to this conversation.
 ```
 
 ## Error Cases
 
 | Condition | Message |
 |-----------|---------|
-| No posts in thread | `No posts found in thread \`<postId>\`.` |
-| Post not found | `Failed to get thread: ChatOps HTTP 404 ...` |
+| Invalid post ID | `Failed to get thread: ChatOps HTTP 404` |
+| No posts | `No posts found in thread \`<id>\`.` |
 | Invalid token | `ChatOps returned 401/403 — check that CHATOPS_TOKEN is valid.` |
 
 ## Examples
 
 **Read a full thread:**
 ```
-chatops_get_thread postId="post_root123abc"
+chatops_get_thread postId="post_root123"
 ```

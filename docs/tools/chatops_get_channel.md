@@ -2,49 +2,51 @@
 
 ## When to Use
 
-Use to get full metadata for a single channel: type, purpose, header, message count. Supports two lookup modes — by channel ID (preferred) or by team ID + channel name slug.
+Get detailed metadata for a specific ChatOps channel. Can look up by `channelId` (preferred) or by `teamId` + `channelName` (slug). Returns type, message count, purpose, and header.
 
 ## Input
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `channelId` | string | Conditional | — | Channel ID (preferred). Provide this OR teamId+channelName. |
-| `teamId` | string | Conditional | — | Team ID — required when looking up by `channelName` |
-| `channelName` | string | Conditional | — | Channel slug/URL name (e.g. `general`). Used only if `channelId` not provided. |
+| `channelId` | string | No | — | ChatOps channel ID (preferred lookup) |
+| `teamId` | string | No | — | Team ID — required when looking up by `channelName` |
+| `channelName` | string | No | — | Channel slug — used only when `channelId` is not provided |
 
-> At least one of `channelId`, or both `teamId` + `channelName`, must be provided.
+At least `channelId` **or** both `teamId` + `channelName` must be provided.
 
 ## Output
 
 ```
-## # General
+## # Town Square
 
 - **ID**: `ch_abc123`
-- **Name (slug)**: `general`
+- **Name (slug)**: `town-square`
 - **Team ID**: `team_xyz`
 - **Type**: public
-- **Total messages**: 5432
-- **Last post**: 2024-03-15T10:23:00.000Z
-- **Purpose**: General team communication
-- **Header**: Welcome to #general!
+- **Total messages**: 1,234
+- **Last post**: 2024-04-26 14:30
+- **Purpose**: Team announcements and general discussion
+
+---
+💡 Use `chatops_get_channel_posts` to read messages, or `chatops_get_pinned_posts` for pinned content in this channel.
 ```
 
 ## Error Cases
 
 | Condition | Message |
 |-----------|---------|
-| No params provided | `Provide either channelId, or both teamId and channelName.` |
-| Channel not found | `Failed to get channel: ChatOps HTTP 404 ...` |
+| Channel not found | `Failed to get channel: ChatOps HTTP 404` |
+| Missing params | Zod validation error |
 | Invalid token | `ChatOps returned 401/403 — check that CHATOPS_TOKEN is valid.` |
 
 ## Examples
 
-**By channel ID:**
+**Look up by channel ID:**
 ```
 chatops_get_channel channelId="ch_abc123"
 ```
 
-**By team + channel name:**
+**Look up by name:**
 ```
-chatops_get_channel teamId="team_xyz" channelName="general"
+chatops_get_channel teamId="team_xyz" channelName="town-square"
 ```

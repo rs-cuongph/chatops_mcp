@@ -2,46 +2,38 @@
 
 ## When to Use
 
-Use when the user knows part of a team name and wants to find it quickly without listing all teams. More targeted than `chatops_list_teams` when the workspace has many teams.
+Search for ChatOps teams by name or display name. Use when you know a team's approximate name but not its ID.
 
 ## Input
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `term` | string | ✅ | — | Search term matched against team name and display name |
+| `term` | string | ✅ | — | Search term to match against team name/display name |
 
 ## Output
 
-A Markdown list of matching teams with ID, slug, type, and description.
-
 ```
-## ChatOps Teams matching "eng" (2)
+## ChatOps Teams matching "eng" (1)
 
 1. **Engineering** (`engineering`)
-   - ID: `abc123`
+   - ID: `abc123xyz`
    - Type: open
-   - Description: Main engineering workspace
+   - Description: Engineering team workspace
 
-2. **Platform Engineering** (`platform-eng`)
-   - ID: `xyz789`
-   - Type: invite-only
+---
+💡 Use `chatops_list_channels` with a team ID to browse channels, or `chatops_search_posts` to find specific messages.
 ```
 
 ## Error Cases
 
 | Condition | Message |
 |-----------|---------|
-| No matches | `No teams found matching "<term>".` |
+| No results | `No teams found matching "<term>".` |
 | Invalid token | `ChatOps returned 401/403 — check that CHATOPS_TOKEN is valid.` |
 
 ## Examples
 
-**Search for teams with "eng":**
+**Search for teams:**
 ```
-chatops_search_teams term="eng"
-```
-
-**Find a specific team:**
-```
-chatops_search_teams term="platform"
+chatops_search_teams term="engineering"
 ```

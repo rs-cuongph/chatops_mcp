@@ -2,9 +2,7 @@
 
 ## When to Use
 
-Use to add a reply to an existing message thread in ChatOps. The reply is linked to the root post and grouped with the thread.
-
-Use `chatops_send_message` instead when posting a new top-level message.
+Reply to an existing post/thread in ChatOps. The reply is linked to the root post and appears as a threaded reply. Use `chatops_get_thread` first to read the conversation before replying.
 
 ## Input
 
@@ -12,37 +10,35 @@ Use `chatops_send_message` instead when posting a new top-level message.
 |-----------|------|----------|---------|-------------|
 | `rootPostId` | string | ✅ | — | ID of the root post to reply to |
 | `channelId` | string | ✅ | — | Channel ID where the thread exists |
-| `message` | string | ✅ | — | Reply text. Supports Markdown |
+| `message` | string | ✅ | — | Reply message text. Supports Markdown |
 
 ## Output
 
 ```
 ## ✅ Reply sent
 
-- **Post ID**: `post_reply456`
-- **Thread root**: `post_root123`
+- **Post ID**: `post_reply123`
+- **Thread root**: `post_root456`
 - **Channel**: `ch_abc123`
-- **Sent at**: 2024-03-15T10:35:00.000Z
+- **Sent at**: 2024-04-26 15:00
 
-> Fixed! Rolled back the migration and staging is healthy again.
+> Acknowledged! Will start rollback now.
+
+---
+💡 Use `chatops_get_thread` with postId `post_root456` to see the full conversation.
 ```
 
 ## Error Cases
 
 | Condition | Message |
 |-----------|---------|
-| Root post not found | `Failed to send reply: ChatOps HTTP 404 ...` |
-| Invalid channel | `Failed to send reply: ChatOps HTTP 403 ...` |
+| Invalid post ID | `Failed to send reply: ChatOps HTTP 404` |
+| Invalid channel | `Failed to send reply: ChatOps HTTP 403` |
 | Invalid token | `ChatOps returned 401/403 — check that CHATOPS_TOKEN is valid.` |
 
 ## Examples
 
-**Reply to an existing thread:**
+**Reply to a thread:**
 ```
-chatops_reply_to_thread rootPostId="post_root123" channelId="ch_abc123" message="Issue resolved ✅"
-```
-
-**Reply with Markdown formatting:**
-```
-chatops_reply_to_thread rootPostId="post_root123" channelId="ch_abc123" message="Root cause: **memory leak** in the cache layer. Fix deployed to prod."
+chatops_reply_to_thread rootPostId="post_root456" channelId="ch_abc123" message="Acknowledged! Will start rollback now."
 ```

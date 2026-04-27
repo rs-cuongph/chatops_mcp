@@ -2,10 +2,10 @@
 
 ## When to Use
 
-Use to post a new message to a ChatOps channel. The message will appear as a top-level post (not a thread reply). Supports Markdown formatting.
+Post a new message to a ChatOps channel. The message appears as a top-level post (not a thread reply). Supports Markdown formatting.
 
-To reply to an existing message/thread, use `chatops_reply_to_thread` instead.
-To send a message with files, use `chatops_send_message_with_files`.
+- To reply to an existing thread → use `chatops_reply_to_thread`
+- To send a message with file attachments → use `chatops_send_message_with_files`
 
 ## Input
 
@@ -21,9 +21,12 @@ To send a message with files, use `chatops_send_message_with_files`.
 
 - **Post ID**: `post_newmsg123`
 - **Channel**: `ch_abc123`
-- **Sent at**: 2024-03-15T10:30:00.000Z
+- **Sent at**: 2024-04-26 14:30
 
-> Hello team! Deployment for v2.4.0 starts in 10 minutes. Please…
+> Deployment complete ✅
+
+---
+💡 Use `chatops_reply_to_thread` with rootPostId `post_newmsg123` to start a thread, or `chatops_add_reaction` to react to this message.
 ```
 
 ## Error Cases
